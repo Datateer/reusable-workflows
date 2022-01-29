@@ -120,7 +120,7 @@ jobs:
 
       # If meltano is not in use, then then the security group ID will be empty and this step will not run
       - name: Add public IP to AWS security group so that meltano can deploy to the database
-        if: ${{ null == steps.security_group_id_step.outputs.security_group_id  }}
+        if: ${{ null != steps.security_group_id_step.outputs.security_group_id  }}
         uses: sohelamin/aws-security-group-add-ip-action@master
         with:
           aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
