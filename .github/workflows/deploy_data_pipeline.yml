@@ -111,6 +111,28 @@ jobs:
       - name: Pull down config settings files
         run: datateer pipeline -e $DATATEER_ENV pull-config
         
+      - name: Get AWS security group ID for the meltano database
+        if: env.
+        id: security_group_id_step
+        run: |
+          VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=default --query "Vpcs[].VpcId" --output text)
+          SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=meltano-db-sg --query 'SecurityGroups[*].[GroupId]' --output text)
+          echo "::set-output name=security_group_id::$SECURITY_GROUP_ID"
+
+      # If meltano is not in use, then then the security group ID will be empty and this step will not run
+      - name: Add public IP to AWS security group so that meltano can deploy to the database
+        if: ${{ null == steps.security_group_id_step.outputs.security_group_id  }}
+        uses: sohelamin/aws-security-group-add-ip-action@master
+        with:
+          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
+          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
+          aws-region: ${{ inputs.awsRegion }}
+          aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
+          port: '5432'
+          to-port: '5432'
+          protocol: 'tcp'
+          description: 'Created by a GitHub Action - will be deleted when finished'
+
       - name: Load docker layer cache
         uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
@@ -121,25 +143,6 @@ jobs:
             datateer-docker-pipeline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-
             datateer-docker-pipeline-${{ inputs.clientCode }}-
             datateer-docker-pipeline-
-
-      - name: Get AWS security group ID for the meltano database
-        id: security_group_id_step
-        run: |
-          VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=default --query "Vpcs[].VpcId" --output text)
-          SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=meltano-db-sg --query 'SecurityGroups[*].[GroupId]' --output text)
-          echo "::set-output name=security_group_id::$SECURITY_GROUP_ID"
-
-      - name: Add public IP to AWS security group so that meltano can deploy to the database
-        uses: sohelamin/aws-security-group-add-ip-action@master
-        with:
-          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
-          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
-          aws-region: ${{ inputs.awsRegion }}
-          aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
-          port: '5432'
-          to-port: '5432'
-          protocol: 'tcp'
-          description: 'Created by GitHub Action - deleted when finished'
 
       - name: Deploy pipeline
         run: datateer pipeline -e $DATATEER_ENV deploy
