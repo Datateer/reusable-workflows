@@ -34,7 +34,7 @@ on:
         required: true
 
 env:
-  CLIENT_CODE: ${{ secrets.clientCode }} # used by the datateer CLI command that pulls down config settings
+  CLIENT_CODE: ${{ input.clientCode }} # used by the datateer CLI command that pulls down config settings
 
 jobs:
   deploy_pipeline:
