@@ -4,12 +4,16 @@ name: Deploy Data Pipeline
 on: 
   workflow_call:
     inputs:
-      clientCode:
-        description: The lowercase Datateer client code e.g. pkt, hmn, etc
+      awsAccountId:
+        description: The client's AWS account ID
         required: true
         type: string
       awsRegion:
         description: The client's AWS account region e.g. us-east-1, eu-west-2, etc
+        required: true
+        type: string
+      clientCode:
+        description: The lowercase Datateer client code e.g. pkt, hmn, etc
         required: true
         type: string
       datateerCliVersion:
@@ -146,6 +150,7 @@ jobs:
       - name: Deploy pipeline
         run: datateer pipeline -e $DATATEER_ENV deploy
         env:
+          AWS_ACCOUNT_ID: ${{ inputs.awsAccountId }}
           CLIENT_CODE: ${{ inputs.clientCode }}
           DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
           PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.deployKeyPrefect }}
