@@ -7,12 +7,10 @@ on:
       test_input:
         description: 'tester'
         default: 'tester'
-        required: true
         type: string
     secrets:
       test_secret:
         description: 'test secret'
-        required: true
         
 jobs:
   deploy_pipeline:
