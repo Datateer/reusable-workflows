@@ -146,8 +146,9 @@ jobs:
       - name: Deploy pipeline
         run: datateer pipeline -e $DATATEER_ENV deploy
         env:
-          PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.deployKeyPrefect }}
+          CLIENT_CODE: ${{ inputs.clientCode }}
           DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
+          PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.deployKeyPrefect }}
           
       - name: Deploy documentation
         run: datateer docs deploy -c ${{ inputs.clientCode }}
