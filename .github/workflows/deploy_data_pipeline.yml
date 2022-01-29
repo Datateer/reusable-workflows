@@ -4,9 +4,10 @@ name: Deploy Data Pipeline
 on: 
   workflow_call:
     inputs:
-      test_input:
-        description: 'tester'
-        default: 'tester'
+      datateerCliVersion:
+        description: Datateer CLI version
+        required: true
+        default: v0.5.0
         type: string
     secrets:
       test_secret:
@@ -21,5 +22,91 @@ jobs:
     name: Build and deploy the pipeline
     steps:
       - name: tester step
-        run: echo "this is a test"
+        run: echo "this is a test ${{  inputs.datateerCliVersion }}"
 
+
+# env:
+#   # the pipeline requires this to pass it into the docker container to install the datateer-prefect package
+#   DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
+#   DATATEER_CLI_VERSION: ${{ github.event.inputs.datateerCliVersion || 'v0.5.0' }}
+#   CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
+#   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+#   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         python-version: [3.8]
+#     steps:
+#       - name: Set DATATEER_ENV (prod)
+#         if: github.ref == 'refs/heads/main'
+#         run: echo "DATATEER_ENV=prod" >> $GITHUB_ENV
+#       - name: Set DATATEER_ENV (staging)
+#         if: github.ref != 'refs/heads/main'
+#         run: echo "DATATEER_ENV=staging" >> $GITHUB_ENV
+#       - name: Load Env Vars from AWS Secrets Manager
+#         uses: say8425/aws-secrets-manager-actions@v2
+#         with:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+#           SECRET_NAME: datateer-pipeline-settings-${{ env.DATATEER_ENV }}
+
+#       - name: Check if env variable is set after fetching secrets
+#         run: if [ -z $MELTANO_DATABASE_URI ]; then echo "MELTANO_DATABASE_URI is not set"; else echo "MELTANO_DATABASE_URI IS SET TO $MELTANO_DATABASE_URI"; fi
+#       - name: Setup python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#       - name: Install Graphviz
+#         run: sudo apt-get install graphviz graphviz-dev
+#       - name: Upgrade pip and setuptools
+#         run: pip install --upgrade pip setuptools
+#       - name: Checkout Datateer CLI
+#         uses: actions/checkout@v2
+#         with:
+#           repository: Datateer/datateer-devops
+#           ref: ${{ env.DATATEER_CLI_VERSION }}
+#           ssh-key: ${{ secrets.DATATEER_DEPLOY_KEY_DEVOPS_LIB }}
+#           path: datateer-devops
+#       - name: Install Datateer CLI
+#         run: pip install ./datateer-devops/
+#       # This has a serious limitation that makes it difficult to use beyond a single SSH key. Ref https://github.com/webfactory/ssh-agent#using-multiple-keys
+#       - name: Setup SSH
+#         uses: webfactory/ssh-agent@v0.4.1
+#         with:
+#           ssh-private-key: |
+#             ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
+#       - name: Checkout pipeline
+#         uses: actions/checkout@v2
+#       - run: chmod 755 ./.datateer/build_scripts/pre-build.sh
+#       - run: ./.datateer/build_scripts/pre-build.sh
+#       - run: pip install .
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY }}
+#           aws-secret-access-key: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET }}
+#           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+#       - name: Pull down config settings files
+#         run: datateer pipeline -e $DATATEER_ENV pull-config
+#       - name: Load docker layer cache
+#         uses: satackey/action-docker-layer-caching@v0.0.11
+#         # Ignore the failure of a step and avoid terminating the job.
+#         continue-on-error: true
+#         with:
+#           key: datateer-docker-pipline-${{ env.CLIENT_CODE }}-${{ env.DATATEER_ENV }}-{hash}
+#           restore-keys: |
+#             datateer-docker-pipeline-${{ env.CLIENT_CODE }}-${{ env.DATATEER_ENV }}-
+#             datateer-docker-pipeline-${{ env.CLIENT_CODE }}-
+#             datateer-docker-pipeline-
+#       - name: Deploy pipeline
+#         run: datateer pipeline -e $DATATEER_ENV deploy
+#         env:
+#           PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT }}
+#       - name: Deploy documentation
+#         run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
