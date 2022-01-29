@@ -21,9 +21,6 @@ jobs:
       matrix:
         python-version: [3.8]
     name: Build and deploy the pipeline
-    strategy:
-      matrix:
-        python-version: [3.8]
     steps:
       - name: tester step
         run: echo "this is a test"
