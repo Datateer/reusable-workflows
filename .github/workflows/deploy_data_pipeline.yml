@@ -44,8 +44,8 @@ jobs:
         python-version: [3.8]
     name: Build and deploy the pipeline
     steps:
-      - run: echo "clientCode = ${{ env.clientCode }}"
-
+      - run: echo "key ${{ secrets.deploymentAgentAwsAccessKey }}"
+      - run: echo "secret ${{ secrets.deploymentAgentAwsAccessKeySecret }}"
       - name: Set DATATEER_ENV (prod)
         if: github.ref == 'refs/heads/main'
         run: echo "DATATEER_ENV=prod" >> $GITHUB_ENV
