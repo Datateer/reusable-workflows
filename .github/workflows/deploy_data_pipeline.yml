@@ -141,7 +141,7 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
         with:
-          key: datateer-docker-pipline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-{hash}
+          key: datateer-docker-pipeline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-{hash}
           restore-keys: |
             datateer-docker-pipeline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-
             datateer-docker-pipeline-${{ inputs.clientCode }}-
