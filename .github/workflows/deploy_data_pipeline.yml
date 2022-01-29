@@ -8,7 +8,7 @@ on:
         description: Datateer CLI version. See https://pypi.org/project/datateer-cli/
         default: v0.5.0
         type: string
-    secrets:
+    # secrets:
         
 jobs:
   deploy_pipeline:
