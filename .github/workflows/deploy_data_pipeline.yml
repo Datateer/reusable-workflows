@@ -112,7 +112,6 @@ jobs:
         run: datateer pipeline -e $DATATEER_ENV pull-config
         
       - name: Get AWS security group ID for the meltano database
-        if: env.
         id: security_group_id_step
         run: |
           VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=default --query "Vpcs[].VpcId" --output text)
