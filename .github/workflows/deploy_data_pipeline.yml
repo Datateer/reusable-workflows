@@ -10,6 +10,14 @@ on:
         type: string
     # secrets:
         
+env:
+#   # the pipeline requires this to pass it into the docker container to install the datateer-prefect package
+  DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
+#   DATATEER_CLI_VERSION: ${{ github.event.inputs.datateerCliVersion || 'v0.5.0' }}
+#   CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
+#   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+#   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
 jobs:
   deploy_pipeline:
     runs-on: ubuntu-latest
@@ -19,16 +27,9 @@ jobs:
     name: Build and deploy the pipeline
     steps:
       - name: tester step
-        run: echo "this is a test ${{  secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}"
+        run: echo "this is a test ${{  secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}. did it work?"
 
 
-# env:
-#   # the pipeline requires this to pass it into the docker container to install the datateer-prefect package
-#   DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
-#   DATATEER_CLI_VERSION: ${{ github.event.inputs.datateerCliVersion || 'v0.5.0' }}
-#   CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
-#   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-#   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
 
 
