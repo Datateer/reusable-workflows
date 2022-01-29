@@ -4,22 +4,35 @@ name: Deploy Data Pipeline
 on: 
   workflow_call:
     inputs:
+      clientCode:
+        description: The lowercase Datateer client code e.g. pkt, hmn, etc
+        required: true
+        type: string
+      awsRegion:
+        description: The client's AWS account region e.g. us-east-1, eu-west-2, etc
+        required: true
+        type: string
       datateerCliVersion:
         description: Datateer CLI version. See https://pypi.org/project/datateer-cli/
         default: v0.5.0
         type: string
     secrets:
-      DATATEER_DEPLOY_KEY_PREFECT_LIB:
-        description: The deployment key that allows access to Datateer/datateer-prefect
+      deployKeyDevopsLib:
+        description: The deployment key that allows access to Datateer/datateer-devops. This is available as an organization secret
+        required: true
+      deployKeyPrefectLib:
+        description: The deployment key that allows access to Datateer/datateer-prefect. This is available as an organization secret
+        required: true
+      deploymentAgentAwsAccessKey:
+        description: The AWS Access Key ID for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
+        required: true
+      deploymentAgentAwsAccessKeySecret: 
+        description: The AWS Access Key Secret for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
         
 env:
 #   # the pipeline requires this to pass it into the docker container to install the datateer-prefect package
-  DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
-#   DATATEER_CLI_VERSION: ${{ github.event.inputs.datateerCliVersion || 'v0.5.0' }}
-#   CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
-#   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-#   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  deployKeyPrefectLib: ${{ secrets.deployKeyPrefectLib }}
 
 jobs:
   deploy_pipeline:
@@ -30,31 +43,19 @@ jobs:
     name: Build and deploy the pipeline
     steps:
       - name: tester step
-        run: echo "this is a test ${{  secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}. did it work?"
-
-
-
-
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         python-version: [3.8]
-#     steps:
-#       - name: Set DATATEER_ENV (prod)
-#         if: github.ref == 'refs/heads/main'
-#         run: echo "DATATEER_ENV=prod" >> $GITHUB_ENV
+        run: echo "this is a test ${{  secrets.deployKeyPrefectLib }}. did it work?"
+      # - name: Set DATATEER_ENV (prod)
+      #   if: github.ref == 'refs/heads/main'
+      #   run: echo "DATATEER_ENV=prod" >> $GITHUB_ENV
 #       - name: Set DATATEER_ENV (staging)
 #         if: github.ref != 'refs/heads/main'
 #         run: echo "DATATEER_ENV=staging" >> $GITHUB_ENV
 #       - name: Load Env Vars from AWS Secrets Manager
 #         uses: say8425/aws-secrets-manager-actions@v2
 #         with:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET }}
-#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+#           AWS_ACCESS_KEY_ID: ${{ secrets.deploymentAgentAwsAccessKey }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
+#           AWS_DEFAULT_REGION: ${{ inputs.awsRegion }}
 #           SECRET_NAME: datateer-pipeline-settings-${{ env.DATATEER_ENV }}
 
 #       - name: Check if env variable is set after fetching secrets
@@ -71,8 +72,8 @@ jobs:
 #         uses: actions/checkout@v2
 #         with:
 #           repository: Datateer/datateer-devops
-#           ref: ${{ env.DATATEER_CLI_VERSION }}
-#           ssh-key: ${{ secrets.DATATEER_DEPLOY_KEY_DEVOPS_LIB }}
+#           ref: ${{ inputs.datateerCliVersion }}
+#           ssh-key: ${{ secrets.deployKeyDevopsLib }}
 #           path: datateer-devops
 #       - name: Install Datateer CLI
 #         run: pip install ./datateer-devops/
@@ -81,7 +82,7 @@ jobs:
 #         uses: webfactory/ssh-agent@v0.4.1
 #         with:
 #           ssh-private-key: |
-#             ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
+#             ${{ secrets.deployKeyPrefectLib }}
 #       - name: Checkout pipeline
 #         uses: actions/checkout@v2
 #       - run: chmod 755 ./.datateer/build_scripts/pre-build.sh
@@ -90,9 +91,9 @@ jobs:
 #       - name: Configure AWS Credentials
 #         uses: aws-actions/configure-aws-credentials@v1
 #         with:
-#           aws-access-key-id: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY }}
-#           aws-secret-access-key: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET }}
-#           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+#           aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
+#           aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
+#           aws-region: ${{ inputs.awsRegion }}
 #       - name: Pull down config settings files
 #         run: datateer pipeline -e $DATATEER_ENV pull-config
 #       - name: Load docker layer cache
@@ -100,14 +101,31 @@ jobs:
 #         # Ignore the failure of a step and avoid terminating the job.
 #         continue-on-error: true
 #         with:
-#           key: datateer-docker-pipline-${{ env.CLIENT_CODE }}-${{ env.DATATEER_ENV }}-{hash}
+#           key: datateer-docker-pipline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-{hash}
 #           restore-keys: |
-#             datateer-docker-pipeline-${{ env.CLIENT_CODE }}-${{ env.DATATEER_ENV }}-
-#             datateer-docker-pipeline-${{ env.CLIENT_CODE }}-
+#             datateer-docker-pipeline-${{ inputs.clientCode }}-${{ env.DATATEER_ENV }}-
+#             datateer-docker-pipeline-${{ inputs.clientCode }}-
 #             datateer-docker-pipeline-
+      # - name: Get AWS security group ID for the meltano database
+      #   id: security_group_id_step
+      #   run: |
+      #     VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=default --query "Vpcs[].VpcId" --output text)
+      #     SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=meltano-db-sg --query 'SecurityGroups[*].[GroupId]' --output text)
+      #     echo "::set-output name=security_group_id::$SECURITY_GROUP_ID"
+      # - name: Add public IP to AWS security group so that meltano can deploy to the database
+      #   uses: sohelamin/aws-security-group-add-ip-action@master
+      #   with:
+      #     aws-access-key-id: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY }}
+      #     aws-secret-access-key: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET }}
+      #     aws-region: ${{ inputs.awsRegion }}
+      #     aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
+      #     port: '5432'
+      #     to-port: '5432'
+      #     protocol: 'tcp'
+      #     description: 'Created by GitHub Action - deleted when finished'
 #       - name: Deploy pipeline
 #         run: datateer pipeline -e $DATATEER_ENV deploy
 #         env:
 #           PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT }}
 #       - name: Deploy documentation
-#         run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
+#         run: datateer docs deploy -c ${{ inputs.clientCode }}
