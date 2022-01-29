@@ -8,7 +8,10 @@ on:
         description: Datateer CLI version. See https://pypi.org/project/datateer-cli/
         default: v0.5.0
         type: string
-    # secrets:
+    secrets:
+      DATATEER_DEPLOY_KEY_PREFECT_LIB:
+        description: The deployment key that allows access to Datateer/datateer-prefect
+        required: true
         
 env:
 #   # the pipeline requires this to pass it into the docker container to install the datateer-prefect package
