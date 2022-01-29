@@ -24,6 +24,4 @@ jobs:
     steps:
       - name: tester step
         run: echo "this is a test"
-        with:
-          test_input: ${{ inputs.test_input }}
-          test_secret: ${{ secrets.test_secret }}
+
