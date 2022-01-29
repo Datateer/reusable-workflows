@@ -21,7 +21,6 @@ jobs:
       matrix:
         python-version: [3.8]
     name: Build and deploy the pipeline
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.8]
