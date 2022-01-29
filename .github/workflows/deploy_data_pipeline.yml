@@ -33,9 +33,6 @@ on:
         description: The AWS Access Key Secret for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
 
-env:
-  CLIENT_CODE: ${{ inputs.clientCode }} # used by the datateer CLI command that pulls down config settings
-
 jobs:
   deploy_pipeline:
     runs-on: ubuntu-latest
@@ -110,7 +107,10 @@ jobs:
 
       - name: Pull down config settings files
         run: datateer pipeline -e $DATATEER_ENV pull-config
+        env:
+          CLIENT_CODE: ${{ inputs.clientCode }}
         
+      # The step that builds the docker image needs access to the meltano database. The next 2 steps dynamically open and close ports allowing github to access the AWS RDS database  
       - name: Get AWS security group ID for the meltano database
         id: security_group_id_step
         run: |
@@ -147,6 +147,7 @@ jobs:
         run: datateer pipeline -e $DATATEER_ENV deploy
         env:
           PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.deployKeyPrefect }}
+          DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
           
       - name: Deploy documentation
         run: datateer docs deploy -c ${{ inputs.clientCode }}
