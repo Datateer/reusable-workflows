@@ -5,8 +5,7 @@ on:
   workflow_call:
     inputs:
       datateerCliVersion:
-        description: Datateer CLI version
-        required: true
+        description: Datateer CLI version. See https://pypi.org/project/datateer-cli/
         default: v0.5.0
         type: string
     secrets:
