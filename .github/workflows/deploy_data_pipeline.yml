@@ -9,8 +9,6 @@ on:
         default: v0.5.0
         type: string
     secrets:
-      test_secret:
-        description: 'test secret'
         
 jobs:
   deploy_pipeline:
@@ -21,7 +19,7 @@ jobs:
     name: Build and deploy the pipeline
     steps:
       - name: tester step
-        run: echo "this is a test ${{  inputs.datateerCliVersion }}"
+        run: echo "this is a test ${{  secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}"
 
 
 # env:
