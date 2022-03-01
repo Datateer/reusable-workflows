@@ -1,7 +1,7 @@
 # this is a reusable workflow that should be used in every <client>-pipeline repository
 # refer to https://docs.github.com/en/actions/using-workflows/reusing-workflows
 name: Deploy Data Pipeline
-on: 
+on:
   workflow_call:
     inputs:
       awsAccountId:
@@ -33,7 +33,7 @@ on:
       deploymentAgentAwsAccessKey:
         description: The AWS Access Key ID for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
-      deploymentAgentAwsAccessKeySecret: 
+      deploymentAgentAwsAccessKeySecret:
         description: The AWS Access Key Secret for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
 
@@ -113,8 +113,8 @@ jobs:
         run: datateer pipeline -e $DATATEER_ENV pull-config
         env:
           CLIENT_CODE: ${{ inputs.clientCode }}
-        
-      # The step that builds the docker image needs access to the meltano database. The next 2 steps dynamically open and close ports allowing github to access the AWS RDS database  
+
+      # The step that builds the docker image needs access to the meltano database. The next 2 steps dynamically open and close ports allowing github to access the AWS RDS database
       - name: Get AWS security group ID for the meltano database
         id: security_group_id_step
         run: |
@@ -131,10 +131,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
           aws-region: ${{ inputs.awsRegion }}
           aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
-          port: '5432'
-          to-port: '5432'
-          protocol: 'tcp'
-          description: 'Created by a GitHub Action - will be deleted when finished'
+          port: "5432"
+          to-port: "5432"
+          protocol: "tcp"
+          description: "Created by a GitHub Action - will be deleted when finished"
 
       - name: Load docker layer cache
         uses: satackey/action-docker-layer-caching@v0.0.11
@@ -153,7 +153,7 @@ jobs:
           AWS_ACCOUNT_ID: ${{ inputs.awsAccountId }}
           CLIENT_CODE: ${{ inputs.clientCode }}
           DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
-          PREFECT__CLOUD__AUTH_TOKEN: ${{ secrets.deployKeyPrefect }}
-          
+          PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect }}
+
       - name: Deploy documentation
         run: datateer docs deploy -c ${{ inputs.clientCode }}
