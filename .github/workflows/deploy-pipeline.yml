@@ -1,0 +1,56 @@
+# this is a reusable workflow that should be used in every <client>-pipeline repository
+# refer to https://docs.github.com/en/actions/using-workflows/reusing-workflows
+name: Deploy Pipeline
+on:
+  workflow_call:
+    inputs:
+	  environment:
+	    description: The target environment to deploy to. prod, stg, qa, int, or a development environment
+		required: true
+		default: int
+		type: string
+      awsAccountId:
+        description: The client's AWS account ID
+        required: false # defaults to repo secret AWS_ACCOUNT_ID
+        type: string
+      awsRegion:
+        description: The client's AWS account region e.g. us-east-1, eu-west-2, etc
+        required: false # defaults to repo secret AWS_REGION
+        type: string
+      clientCode:
+        description: The lowercase Datateer client code e.g. pkt, hmn, etc
+        required: false # defaults to repo secret CLIENT_CODE
+        type: string
+      datateerCliVersion:
+        description: Datateer CLI version. Leave blank to use the latest version. See https://pypi.org/project/datateer-cli/
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    name: Build and deploy the pipeline
+	env:
+	  AWS_ACCOUNT_ID: ${{ inputs.awsAccountId || secrets.AWS_ACCOUNT_ID }}
+	  AWS_REGION: ${{ inputs.awsRegion || secrets.AWS_REGION }}
+	  CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
+	  DATATEER_ENV = ${{ inputs.environment || "int" }}
+  steps:
+	  - name: Prerequisites
+      run: |
+        [ -n {{ env.AWS_ACCOUNT_ID }} ] || echo "Could not find AWS_ACCOUNT_ID" && exit 1
+        [ -n {{ env.AWS_REGION }} ] || echo "Could not find AWS_REGION" && exit 1
+        [ -n {{ env.CLIENT_CODE}} ] || echo "Could not find CLIENT_CODE" && exit 1
+        [ -n {{ env.DATATEER_ENV }} ] || echo "Could not find DATATEER_ENV" && exit 1
+        python -m pip install --upgrade pip
+
+        [ -n {{ inputs.datateerCliVersion }} ]
+        then
+          pip install datateer-cli=={{ inputs.datateerCliVersion }}]
+        else
+          pip install datateer-cli
+        fi
+    - name: Checkout {{ env.CLIENT_CODE }}-pipeline
+      uses: actions/checkout@v2	
