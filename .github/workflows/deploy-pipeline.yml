@@ -45,8 +45,10 @@ jobs:
           [ -n "${{ env.AWS_REGION }}" ] || (echo "Could not find AWS_REGION in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.CLIENT_CODE}}" ] || (echo "Could not find CLIENT_CODE in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.DATATEER_ENV }}" ] || (echo "Could not find DATATEER_ENV in the inputs or in environment variables" && exit 1)
+          
           python -m pip install --upgrade pip
-
+          
+          sudo apt-get install graphviz graphviz-dev
           if [ -n "${{ inputs.datateerCliVersion }}" ]
           then
             pip install datateer-cli==${{ inputs.datateerCliVersion }}
@@ -54,7 +56,5 @@ jobs:
             pip install datateer-cli
           fi
 
-      - name: Install Graphviz
-        run: sudo apt-get install graphviz graphviz-dev
       - name: Checkout pipeline repo
         uses: actions/checkout@v2	
