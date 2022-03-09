@@ -47,9 +47,9 @@ jobs:
           [ -n "${{ env.DATATEER_ENV }}" ] || (echo "Could not find DATATEER_ENV in the inputs or in environment variables" && exit 1)
           python -m pip install --upgrade pip
 
-          [ -n {{ inputs.datateerCliVersion }} ]
+          if [ -n "{{ inputs.datateerCliVersion }}" ]
           then
-            pip install datateer-cli=={{ inputs.datateerCliVersion }}]
+            pip install datateer-cli=={{ inputs.datateerCliVersion }}
           else
             pip install datateer-cli
           fi
