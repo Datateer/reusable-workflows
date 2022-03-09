@@ -39,10 +39,10 @@ jobs:
     steps:
       - name: Prerequisites
         run: |
-          [ -n {{ env.AWS_ACCOUNT_ID }} ] || echo "Could not find AWS_ACCOUNT_ID" && exit 1
-          [ -n {{ env.AWS_REGION }} ] || echo "Could not find AWS_REGION" && exit 1
-          [ -n {{ env.CLIENT_CODE}} ] || echo "Could not find CLIENT_CODE" && exit 1
-          [ -n {{ env.DATATEER_ENV }} ] || echo "Could not find DATATEER_ENV" && exit 1
+          [ -n {{ env.AWS_ACCOUNT_ID }} ] || echo "Could not find AWS_ACCOUNT_ID in the inputs or in environment variables" && exit 1
+          [ -n {{ env.AWS_REGION }} ] || echo "Could not find AWS_REGION in the inputs or in environment variables" && exit 1
+          [ -n {{ env.CLIENT_CODE}} ] || echo "Could not find CLIENT_CODE in the inputs or in environment variables" && exit 1
+          [ -n {{ env.DATATEER_ENV }} ] || echo "Could not find DATATEER_ENV in the inputs or in environment variables" && exit 1
           python -m pip install --upgrade pip
 
           [ -n {{ inputs.datateerCliVersion }} ]
