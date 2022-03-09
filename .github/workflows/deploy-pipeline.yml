@@ -6,13 +6,8 @@ on:
     inputs:
       environment:
         description: The target environment to deploy to. prod, stg, qa, int, or a development environment
-        default: int
-        type: choice
-        options:
-          - int
-          - qa
-          - stg
-          - prod
+        required: true
+        type: string
       awsAccountId:
         description: The client's AWS account ID
         required: false # defaults to repo secret AWS_ACCOUNT_ID
