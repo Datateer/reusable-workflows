@@ -53,5 +53,8 @@ jobs:
           else
             pip install datateer-cli
           fi
-      - name: Checkout ${{ env.CLIENT_CODE }}-pipeline
+
+      - name: Install Graphviz
+        run: sudo apt-get install graphviz graphviz-dev
+      - name: Checkout pipeline repo
         uses: actions/checkout@v2	
