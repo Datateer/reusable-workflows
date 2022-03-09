@@ -35,7 +35,7 @@ jobs:
       AWS_ACCOUNT_ID: ${{ inputs.awsAccountId || secrets.AWS_ACCOUNT_ID }}
       AWS_REGION: ${{ inputs.awsRegion || secrets.AWS_REGION }}
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
-      DATATEER_ENV: ${{ inputs.environment || "int" }}
+      DATATEER_ENV: ${{ inputs.environment || 'int' }}
     steps:
       - name: Prerequisites
         run: |
