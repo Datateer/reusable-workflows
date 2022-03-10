@@ -39,6 +39,7 @@ jobs:
     steps:
       - run: echo "${{ env.AWS_ACCOUNT_ID }}"
       - run: echo "${{ inputs.awsAccountId }}"
+      - uses: syphar/restore-pip-download-cache@v1
       - name: Prerequisites
         run: |
           [ -n "${{ env.AWS_ACCOUNT_ID }}" ] || (echo "Could not find AWS_ACCOUNT_ID in the inputs or in environment variables" && exit 1)
