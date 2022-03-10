@@ -130,7 +130,9 @@ jobs:
         run: datateer pipeline deploy main --environment ${{ env.DATATEER_ENV }}
         env:
           DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
-          PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect  }}
+          PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.deploymentAgentAwsAccessKey }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
 
       - name: Deploy documentation
         run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
