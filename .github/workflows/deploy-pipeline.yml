@@ -70,6 +70,7 @@ jobs:
             pip install datateer-cli
           fi
         
+      - run: echo "${{ secrets.deployKeyPrefectLib  }}"
       # This has a serious limitation that makes it difficult to use beyond a single SSH key. Ref https://github.com/webfactory/ssh-agent#using-multiple-keys
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.4.1
