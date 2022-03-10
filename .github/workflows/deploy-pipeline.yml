@@ -83,7 +83,6 @@ jobs:
           ./.datateer/build_scripts/pre-build.sh
           pip install .
 
-      - run: echo "${{ secrets.deploymentAgentAwsAccessKey }}"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
