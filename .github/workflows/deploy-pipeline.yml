@@ -23,7 +23,20 @@ on:
       datateerCliVersion:
         description: Datateer CLI version. Leave blank to use the latest version. See https://pypi.org/project/datateer-cli/
         type: string
-
+    secrets:
+      deployKeyPrefectLib:
+        description: The github deployment key that allows access to Datateer/datateer-prefect. This is available as an organization secret
+        required: true
+      deployKeyPrefect:
+        description: The Prefect deployment key for this client's Prefect project
+        required: true
+      deploymentAgentAwsAccessKey:
+        description: The AWS Access Key ID for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
+        required: true
+      deploymentAgentAwsAccessKeySecret: 
+        description: The AWS Access Key Secret for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
+        required: true
+        
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -62,7 +75,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.4.1
         with:
           ssh-private-key: |
-            ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB  }}
+            ${{ secrets.deployKeyPrefectLib  }}
 
       - name: Checkout pipeline repo
         uses: actions/checkout@v2
@@ -75,8 +88,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY  }}
-          aws-secret-access-key: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET  }}
+          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey  }}
+          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret  }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Pull down config settings files
@@ -95,8 +108,8 @@ jobs:
         if: ${{ null != steps.security_group_id_step.outputs.security_group_id  }}
         uses: sohelamin/aws-security-group-add-ip-action@master
         with:
-          aws-access-key-id: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY  }}
-          aws-secret-access-key: ${{ secrets.DEPLOYMENT_AGENT_AWS_ACCESS_KEY_SECRET  }}
+          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey  }}
+          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret  }}
           aws-region: ${{ env.AWS_REGION }}
           aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
           port: "5432"
@@ -118,8 +131,8 @@ jobs:
       - name: Deploy pipeline
         run: datateer pipeline deploy main --environment ${{ env.DATATEER_ENV }}
         env:
-          DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT_LIB }}
-          PREFECT__CLOUD__API_KEY: ${{ secrets.DATATEER_DEPLOY_KEY_PREFECT  }}
+          DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
+          PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect  }}
 
       - name: Deploy documentation
         run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
