@@ -129,7 +129,7 @@ jobs:
       - name: Deploy pipeline
         run: datateer pipeline deploy main --environment ${{ env.DATATEER_ENV }}
         env:
-          DATATEER_DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
+          DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
           PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect  }}
 
       - name: Deploy documentation
