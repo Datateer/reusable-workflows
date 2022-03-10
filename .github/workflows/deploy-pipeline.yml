@@ -50,8 +50,6 @@ jobs:
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
     steps:
-      - run: echo "${{ env.AWS_ACCOUNT_ID }}"
-      - run: echo "${{ inputs.awsAccountId }}"
       - name: Prerequisites
         run: |
           [ -n "${{ env.AWS_ACCOUNT_ID }}" ] || (echo "Could not find AWS_ACCOUNT_ID in the inputs or in environment variables" && exit 1)
@@ -69,7 +67,6 @@ jobs:
             pip install datateer-cli
           fi
         
-      - run: echo "${{ secrets.deployKeyPrefectLib  }}"
       # This has a serious limitation that makes it difficult to use beyond a single SSH key. Ref https://github.com/webfactory/ssh-agent#using-multiple-keys
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.4.1
@@ -86,11 +83,12 @@ jobs:
           ./.datateer/build_scripts/pre-build.sh
           pip install .
 
+      - run: echo "${{ secrets.deploymentAgentAwsAccessKey }}"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey  }}
-          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret  }}
+          aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
+          aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Pull down config settings files
