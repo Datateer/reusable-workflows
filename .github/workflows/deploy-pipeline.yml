@@ -10,7 +10,7 @@ on:
         type: string
       pipeline_name:
         description: The name of the pipeline flow file e.g. for "pipeline_main.py," input "main"
-        required: true
+        required: false
         type: string
         default: main
       awsAccountId:
