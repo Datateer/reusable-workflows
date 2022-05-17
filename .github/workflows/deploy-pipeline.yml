@@ -8,6 +8,11 @@ on:
         description: The target environment to deploy to. prod, stg, qa, int, or a development environment
         required: true
         type: string
+      pipeline_name:
+        description: The name of the pipeline flow file e.g. for "pipeline_main.py," input "main"
+        required: true
+        type: string
+        default: main
       awsAccountId:
         description: The client's AWS account ID
         required: false # defaults to repo secret AWS_ACCOUNT_ID
@@ -49,6 +54,7 @@ jobs:
       AWS_REGION: ${{ inputs.awsRegion || secrets.AWS_REGION }}
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
+      PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
       - name: Prerequisites
         run: |
@@ -135,4 +141,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
 
       - name: Deploy documentation
-        run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
+        run: datateer docs deploy -c ${{ env.CLIENT_CODE }} {{ env.PIPELINE_NAME }}
