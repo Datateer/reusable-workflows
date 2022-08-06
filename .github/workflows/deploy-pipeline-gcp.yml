@@ -124,5 +124,5 @@ jobs:
           PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect }}
 
       # TODO: get documentation deployment working again
-      - name: Deploy documentation
-        run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
+#       - name: Deploy documentation
+#         run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
