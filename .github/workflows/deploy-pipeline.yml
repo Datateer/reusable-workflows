@@ -100,7 +100,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Pull down config settings files
-        run: datateer config pull --environment ${{ env.DATATEER_ENV }}
+        run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud aws
 
       # The step that builds the docker image needs access to the meltano database. The next 2 steps dynamically open and close ports allowing github to access the AWS RDS database
       - name: Get AWS security group ID for the meltano database
