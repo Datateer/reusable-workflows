@@ -1,3 +1,6 @@
+# DEPRECATION WARNING: this flow has been copied to aws-deploy-pipeline.yml
+# All client pipelines should no longer use this flow, and it will be removed in the near future
+
 # this is a reusable workflow that should be used in every <client>-pipeline repository
 # refer to https://docs.github.com/en/actions/using-workflows/reusing-workflows
 name: Deploy Pipeline
