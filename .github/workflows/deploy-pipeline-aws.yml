@@ -98,7 +98,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
           aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ env.REGION }}
 
       - name: Pull down config settings files
         run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud aws
@@ -118,7 +118,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey  }}
           aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret  }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ env.REGION }}
           aws-security-group-id: ${{ steps.security_group_id_step.outputs.security_group_id }}
           port: "5432"
           to-port: "5432"
