@@ -41,10 +41,10 @@ on:
       deploymentAgentAwsAccessKey:
         description: The AWS Access Key ID for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
-      deploymentAgentAwsAccessKeySecret: 
+      deploymentAgentAwsAccessKeySecret:
         description: The AWS Access Key Secret for the client's deployment agent. This should be stored as a repo secret in <client>-pipeline
         required: true
-        
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -53,21 +53,21 @@ jobs:
         python-version: [3.8]
     name: Build and deploy the pipeline
     env:
-      AWS_ACCOUNT_ID: ${{ inputs.awsAccountId || secrets.AWS_ACCOUNT_ID }}
-      AWS_REGION: ${{ inputs.awsRegion || secrets.AWS_REGION }}
+      ACCOUNT: ${{ inputs.awsAccountId || secrets.AWS_ACCOUNT_ID }}
+      REGION: ${{ inputs.awsRegion || secrets.AWS_REGION }}
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
       - name: Prerequisites
         run: |
-          [ -n "${{ env.AWS_ACCOUNT_ID }}" ] || (echo "Could not find AWS_ACCOUNT_ID in the inputs or in environment variables" && exit 1)
-          [ -n "${{ env.AWS_REGION }}" ] || (echo "Could not find AWS_REGION in the inputs or in environment variables" && exit 1)
+          [ -n "${{ env.ACCOUNT }}" ] || (echo "Could not find ACCOUNT in the inputs or in environment variables" && exit 1)
+          [ -n "${{ env.REGION }}" ] || (echo "Could not find REGION in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.CLIENT_CODE}}" ] || (echo "Could not find CLIENT_CODE in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.DATATEER_ENV }}" ] || (echo "Could not find DATATEER_ENV in the inputs or in environment variables" && exit 1)
-          
+
           python -m pip install --upgrade pip
-          
+
           sudo apt-get install graphviz graphviz-dev
           if [ -n "${{ inputs.datateerCliVersion }}" ]
           then
@@ -75,7 +75,7 @@ jobs:
           else
             pip install datateer-cli
           fi
-        
+
       # This has a serious limitation that makes it difficult to use beyond a single SSH key. Ref https://github.com/webfactory/ssh-agent#using-multiple-keys
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.4.1
