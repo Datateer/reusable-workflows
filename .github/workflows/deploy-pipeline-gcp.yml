@@ -51,16 +51,16 @@ jobs:
         python-version: [3.8]
     name: Build and deploy the pipeline
     env:
-      ACCOUNT: ${{ inputs.gcpProjectId || secrets.GCP_PROJECT_ID }}
-      REGION: ${{ inputs.gcpRegion || secrets.GCP_REGION }}
+      GCP_PROJECT_ID: ${{ inputs.gcpProjectId || secrets.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ inputs.gcpRegion || secrets.GCP_REGION }}
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
       - name: Prerequisites
         run: |
-          [ -n "${{ env.ACCOUNT }}" ] || (echo "Could not find ACCOUNT in the inputs or in environment variables" && exit 1)
-          [ -n "${{ env.REGION }}" ] || (echo "Could not find REGION in the inputs or in environment variables" && exit 1)
+          [ -n "${{ env.GCP_PROJECT_ID }}" ] || (echo "Could not find GCP_PROJECT_ID in the inputs or in environment variables" && exit 1)
+          [ -n "${{ env.GCP_REGION }}" ] || (echo "Could not find GCP_REGION in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.CLIENT_CODE}}" ] || (echo "Could not find CLIENT_CODE in the inputs or in environment variables" && exit 1)
           [ -n "${{ env.DATATEER_ENV }}" ] || (echo "Could not find DATATEER_ENV in the inputs or in environment variables" && exit 1)
 
@@ -118,7 +118,7 @@ jobs:
             datateer-docker-pipeline-
 
       - name: Deploy pipeline
-        run: datateer pipeline deploy ${{ env.PIPELINE_NAME }} --environment ${{ env.DATATEER_ENV }} --cloud gcp --region ${{ env.REGION }} --account ${{ env.ACCOUNT }}
+        run: datateer pipeline deploy ${{ env.PIPELINE_NAME }} --environment ${{ env.DATATEER_ENV }} --cloud gcp --region ${{ env.GCP_REGION }} --account ${{ env.GCP_PROJECT_ID }}
         env:
           DEPLOY_KEY_PREFECT_LIB: ${{ secrets.deployKeyPrefectLib }}
           PREFECT__CLOUD__API_KEY: ${{ secrets.deployKeyPrefect }}
