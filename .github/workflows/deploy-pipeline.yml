@@ -72,8 +72,10 @@ jobs:
           if [ -n "${{ inputs.datateerCliVersion }}" ]
           then
             pip install datateer-cli==${{ inputs.datateerCliVersion }}
+            pip install datateer-cli[visualization]==${{ inputs.datateerCliVersion }}
           else
             pip install datateer-cli
+            pip install datateer-cli[visualization]
           fi
 
       # This has a serious limitation that makes it difficult to use beyond a single SSH key. Ref https://github.com/webfactory/ssh-agent#using-multiple-keys
