@@ -91,20 +91,18 @@ jobs:
       - uses: syphar/restore-pip-download-cache@v1
       - run: |
           pip install .
-
-      - name: Pull down config settings files
-        run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud aws
-      
-      - run: |
-          chmod 755 ./.datateer/build_scripts/pre-build.sh
-          ./.datateer/build_scripts/pre-build.sh
-      
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.deploymentAgentAwsAccessKey }}
           aws-secret-access-key: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
           aws-region: ${{ env.AWS_REGION }}
+      - name: Pull down config settings files
+        run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud aws
+      
+      - run: |
+          chmod 755 ./.datateer/build_scripts/pre-build.sh
+          ./.datateer/build_scripts/pre-build.sh
 
 
       # The step that builds the docker image needs access to the meltano database. The next 2 steps dynamically open and close ports allowing github to access the AWS RDS database
