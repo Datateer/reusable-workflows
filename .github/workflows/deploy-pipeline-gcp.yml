@@ -46,9 +46,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
+#     strategy:
+#       matrix:
+#         python-version: [3.8]
     name: Build and deploy the pipeline
     env:
       GCP_PROJECT_ID: ${{ inputs.gcpProjectId || secrets.GCP_PROJECT_ID }}
@@ -57,6 +57,10 @@ jobs:
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pip' # caching pip dependencies
       - run: python -V
       - name: Prerequisites
         run: |
