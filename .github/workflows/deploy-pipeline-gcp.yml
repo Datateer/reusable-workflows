@@ -57,6 +57,7 @@ jobs:
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
+      - run: python -V
       - name: Prerequisites
         run: |
           [ -n "${{ env.GCP_PROJECT_ID }}" ] || (echo "Could not find GCP_PROJECT_ID in the inputs or in environment variables" && exit 1)
