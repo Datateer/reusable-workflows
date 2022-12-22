@@ -61,8 +61,7 @@ jobs:
         with:
           python-version: "3.8"
           cache: "pip" # caching pip dependencies
-          cache-dependency-path: |
-            setup.py
+          cache-dependency-path: setup.py
       - run: pip install -e .
       - run: python -V
 
