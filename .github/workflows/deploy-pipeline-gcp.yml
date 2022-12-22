@@ -46,9 +46,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         python-version: [3.8]
     name: Build and deploy the pipeline
     env:
       GCP_PROJECT_ID: ${{ inputs.gcpProjectId || secrets.GCP_PROJECT_ID }}
@@ -59,11 +56,14 @@ jobs:
     steps:
       - name: Checkout pipeline repo
         uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.8"
+          cache: "pip" # caching pip dependencies
+
       - run: python -V
+
       - name: Prerequisites
         run: |
           [ -n "${{ env.GCP_PROJECT_ID }}" ] || (echo "Could not find GCP_PROJECT_ID in the inputs or in environment variables" && exit 1)
@@ -90,9 +90,6 @@ jobs:
           ssh-private-key: |
             ${{ secrets.deployKeyPrefectLib  }}
 
-
-      - uses: syphar/restore-pip-download-cache@v1
-
       - id: "auth"
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v0"
@@ -106,8 +103,6 @@ jobs:
           username: "oauth2accesstoken"
           password: "${{ steps.auth.outputs.access_token }}"
 
-      - run: |
-          pip install .
       - name: Pull down config settings files
         run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud gcp --region ${{ env.GCP_REGION }} --config-bucket datateer-managed-${{ env.GCP_PROJECT_ID }}-prefect-config-data
 

@@ -49,9 +49,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
     name: Build and deploy the pipeline
     env:
       AWS_ACCOUNT_ID: ${{ inputs.awsAccountId || secrets.AWS_ACCOUNT_ID }}
@@ -60,6 +57,16 @@ jobs:
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
     steps:
+      - name: Checkout pipeline repo
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          cache: "pip" # caching pip dependencies
+
+      - run: python -V
+
       - name: Prerequisites
         run: |
           [ -n "${{ env.AWS_ACCOUNT_ID }}" ] || (echo "Could not find AWS_ACCOUNT_ID in the inputs or in environment variables" && exit 1)
@@ -86,12 +93,6 @@ jobs:
           ssh-private-key: |
             ${{ secrets.deployKeyPrefectLib  }}
 
-      - name: Checkout pipeline repo
-        uses: actions/checkout@v2
-
-      - uses: syphar/restore-pip-download-cache@v1
-      - run: |
-          pip install .
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -147,5 +148,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.deploymentAgentAwsAccessKey }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.deploymentAgentAwsAccessKeySecret }}
 
-      - name: Deploy documentation
-        run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
+      # - name: Deploy documentation
+      #   run: datateer docs deploy -c ${{ env.CLIENT_CODE }}
