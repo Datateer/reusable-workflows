@@ -62,7 +62,7 @@ jobs:
           python-version: "3.8"
           cache: "pip" # caching pip dependencies
           cache-dependency-path: setup.py
-      - run: pip install -e .
+
       - run: python -V
 
       - name: Prerequisites
@@ -90,6 +90,8 @@ jobs:
         with:
           ssh-private-key: |
             ${{ secrets.deployKeyPrefectLib  }}
+
+      - run: pip install -e .
 
       - id: "auth"
         name: "Authenticate to Google Cloud"
