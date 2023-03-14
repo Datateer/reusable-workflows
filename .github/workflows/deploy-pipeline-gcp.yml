@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and deploy the pipeline
     env:
-      GCP_PROJECT_ID: ${{ inputs.gcpProjectId || secrets.GCP_PROJECT_ID }}
+      GCP_PROJECT_ID: datateer-prod
       GCP_REGION: ${{ inputs.gcpRegion || secrets.GCP_REGION }}
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
@@ -107,7 +107,7 @@ jobs:
           password: "${{ steps.auth.outputs.access_token }}"
 
       - name: Pull down config settings files
-        run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud gcp --region ${{ env.GCP_REGION }} --config-bucket datateer-managed-${{ env.GCP_PROJECT_ID }}-prefect-config-data
+        run: datateer config pull --environment ${{ env.DATATEER_ENV }} --cloud gcp --region ${{ env.GCP_REGION }} --config-bucket ${{ env.CLIENT_CODE }}-prefect-config-data
 
       - run: |
           chmod 755 ./.datateer/build_scripts/pre-build.sh
