@@ -33,7 +33,7 @@ on:
         description: Datateer CLI version. Leave blank to use the latest version. See https://pypi.org/project/datateer-cli/
         type: string
       meltanoVersion:
-        description: Temporary fix until we are upgraded to Prefect 2.0. Specify the meltano version. 2.1 to 2.4 has a breaking change. Defaults to 2.1. Only set a value if you need something different
+        description: Temporary fix until we are upgraded to Prefect 2.0. Specify "2.4.0" or leave blank to default to 2.1.0
         type: string
     secrets:
       deployKeyPrefectLib:
