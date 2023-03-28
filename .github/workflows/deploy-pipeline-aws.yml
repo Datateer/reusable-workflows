@@ -32,6 +32,9 @@ on:
       datateerCliVersion:
         description: Datateer CLI version. Leave blank to use the latest version. See https://pypi.org/project/datateer-cli/
         type: string
+      meltanoVersion:
+        description: Temporary fix until we are upgraded to Prefect 2.0. Specify "2.4.0" or leave blank to default to 2.1.0
+        type: string
     secrets:
       deployKeyPrefectLib:
         description: The github deployment key that allows access to Datateer/datateer-prefect. This is available as an organization secret
@@ -56,6 +59,7 @@ jobs:
       CLIENT_CODE: ${{ inputs.clientCode || secrets.CLIENT_CODE }}
       DATATEER_ENV: ${{ inputs.environment || 'int' }}
       PIPELINE_NAME: ${{ inputs.pipeline_name || 'main' }}
+      MELTANO_ENV: ${{ inputs.meltanoVersion }}
     steps:
       - name: Checkout pipeline repo
         uses: actions/checkout@v2
