@@ -35,6 +35,7 @@ on:
       meltanoVersion:
         description: Temporary fix until we are upgraded to Prefect 2.0. Specify "2.4.0" or leave blank to default to 2.1.0
         type: string
+        required: false
     secrets:
       deployKeyPrefectLib:
         description: The github deployment key that allows access to Datateer/datateer-prefect. This is available as an organization secret
